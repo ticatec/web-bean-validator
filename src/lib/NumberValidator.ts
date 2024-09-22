@@ -13,19 +13,19 @@ export default class NumberValidator extends BaseValidator {
     protected minValue: number;
     protected maxValue: number;
 
-    constructor(field: string, name: string,  options: NumberValidatorOptions = null) {
-        super(field, name, options.required == true, options.ignoreWhen, options.check);
+    constructor(field: string, options: NumberValidatorOptions = null) {
+        super(field, options.required == true, options.ignoreWhen, options.check);
         this.minValue = options?.minValue;
         this.maxValue = options?.maxValue;
     }
 
-    protected checkField(value: any, result: ValidationResult, prefix: string): boolean {
+    protected checkField(value: any, result: ValidationResult): boolean {
         if (this.minValue != null && value < this.minValue) {
-            result.appendError(this.formatMessage(getMessage().NUMBER_SHORTAGE, prefix, this.minValue));
+            result.setError(this.field, this.formatMessage(getMessage().NUMBER_SHORTAGE, this.minValue));
             return false;
         }
         if (this.maxValue != null && value > this.maxValue) {
-            result.appendError(this.formatMessage(getMessage().NUMBER_EXCEED, prefix, this.maxValue));
+            result.setError(this.field, this.formatMessage(getMessage().NUMBER_EXCEED, this.maxValue));
             return false;
         }
         return true;
@@ -37,9 +37,4 @@ export default class NumberValidator extends BaseValidator {
         }
         return isNaN(value) ? null : value;
     }
-
-    protected getErrorType(): string {
-        return getMessage().INVALID_NUMBER;
-    }
-
 }

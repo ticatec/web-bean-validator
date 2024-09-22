@@ -1,5 +1,5 @@
 import BaseValidator, {ValidatorOptions} from "./BaseValidator";
-import ValidationResult from "./ValidationResult";
+import type ValidationResult from "./ValidationResult";
 import {getMessage} from "./Locale";
 
 export interface DateValidatorOptions extends ValidatorOptions {
@@ -17,24 +17,24 @@ export default class DateValidator extends BaseValidator {
     protected maxDaysBefore: number;
     protected maxDaysAfter: number;
 
-    constructor(field: string, name: string,  options: DateValidatorOptions = null) {
-        super(field, name, options.required == true, options.ignoreWhen, options.check);
+    constructor(field: string, options: DateValidatorOptions = null) {
+        super(field, options.required == true, options.ignoreWhen, options.check);
         this.from = options?.from;
         this.to = options?.to;
         this.maxDaysAfter = options?.maxDaysAfter;
         this.maxDaysBefore = options?.maxDaysBefore;
     }
 
-    protected checkField(value: any, result: ValidationResult, prefix: string): boolean {
+    protected checkField(value: any, result: ValidationResult): boolean {
         let now = (new Date()).getTime();
         let latestDate = this.maxDaysAfter != null ? new Date(now + this.maxDaysAfter * 86400000) : this.to;
         let earliestDate = this.maxDaysBefore != null ? new Date(now - this.maxDaysBefore * 8640000) : this.from;
         if (earliestDate && earliestDate > value) {
-            result.appendError(this.formatMessage(getMessage().EARLIEST_DATE, prefix, earliestDate.toDateString()));
+            result.setError(this.field, this.formatMessage(getMessage().EARLIEST_DATE, earliestDate.toDateString()));
             return false;
         }
         if (latestDate && latestDate < value) {
-            result.appendError(this.formatMessage(getMessage().FINAL_DATE, prefix, latestDate.toDateString()));
+            result.setError(this.field, this.formatMessage(getMessage().FINAL_DATE, latestDate.toDateString()));
             return false;
         }
         return true;
@@ -49,8 +49,5 @@ export default class DateValidator extends BaseValidator {
         return value instanceof Date ? value : null;
     }
 
-    protected getErrorType(): string {
-        return getMessage().INVALID_DATE;
-    }
 
 }

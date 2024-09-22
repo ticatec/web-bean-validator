@@ -50,7 +50,7 @@ interface StringValidatorOptions extends ValidatorOptions {
     }
 }
 
-new StringValidator(field, name, options);
+new StringValidator(field, options);
 ```
 
 ### 数字类型校验器
@@ -63,7 +63,7 @@ interface NumberValidatorOptions extends ValidatorOptions {
     maxValue?: number,  //最大值
 }
 
-new NumberValidator(field, name, options);
+new NumberValidator(field, options);
 ```
 
 
@@ -79,7 +79,7 @@ interface DateValidatorOptions extends ValidatorOptions{
     maxDaysAfter?: number,  //最后开始的天数
 }
 
-new DateValidator(field, name, options);
+new DateValidator(field, options);
 ```
 
 
@@ -93,7 +93,7 @@ interface EnumValidatorOptions extends ValidatorOptions {
     check?: CustomCheck, //自定义的校验函数
 }
 
-new EnumValidator(field, name, options);
+new EnumValidator(field, options);
 ```
 
 
@@ -105,7 +105,7 @@ new EnumValidator(field, name, options);
 interface BooleanValidatorOptions extends ValidatorOptions {
 }
 
-new BooleanValidator(field, name, options);
+new BooleanValidator(field, options);
 ```
 
 
@@ -118,7 +118,7 @@ interface ObjectValidatorOptions extends ValidatorOptions {
     rules: Array<BaseValidator>;
 }
 
-new ObjectValidator(field, name, options);
+new ObjectValidator(field, options);
 ```
 
 
@@ -133,5 +133,5 @@ interface ArrayValidatorOptions extends ValidatorOptions {
     maxLen?: number;
 }
 
-new ArrayValidator(field, name, options);
+new ArrayValidator(field, options);
 ```
