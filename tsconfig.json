@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"esModuleInterop": true,
+		"target": "es2017",
+		"resolveJsonModule": true,
+		"moduleResolution": "node",
+		"declaration": true,
+		"sourceMap": false,
+		"rootDir": "src",
+		"outDir": "dist"
+	},
+	"lib": ["es2017"]
+}
