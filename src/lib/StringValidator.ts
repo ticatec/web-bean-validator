@@ -1,5 +1,5 @@
 import BaseValidator, {ValidatorOptions} from "./BaseValidator";
-import type ValidationResult from "./ValidationResult";
+import  ValidationResult from "./ValidationResult";
 import {getMessage} from "./Locale";
 
 interface StringFormat {
@@ -21,6 +21,15 @@ export default class StringValidator extends BaseValidator {
         super(field, options?.required == true, options.ignoreWhen, options.check);
         this.minLen = options?.minLen;
         this.format = options?.format;
+    }
+
+    /**
+     * 同时检查字符串是否为空
+     * @param value
+     * @protected
+     */
+    protected checkNullValue(value: string): boolean {
+        return super.checkNullValue(value) || value.length==0;
     }
 
     protected checkType(value: any): any {

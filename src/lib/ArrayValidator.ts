@@ -1,7 +1,6 @@
 import BaseValidator, {ValidatorOptions} from "./BaseValidator";
 import type ValidationResult from "./ValidationResult";
 import {getMessage} from "./Locale";
-import beanValidator from "./BeanValidator";
 import NestValidator from "./NestValidator";
 
 

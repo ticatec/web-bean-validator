@@ -46,7 +46,7 @@ export default abstract class BaseValidator {
         let ignore = this.ignoreWhen != null && this.ignoreWhen(obj);
         if (!ignore) {
             let value = this.extractFieldValue(data);
-            if (value == null) {
+            if (this.checkNullValue(value)) {
                 if (this.required) {
                     result.setError(this.field, this.formatMessage(getMessage().REQUIRED));
                 }
@@ -97,6 +97,14 @@ export default abstract class BaseValidator {
      */
     protected getFieldLabel(): string {
         return this.name ?? this.field;
+    }
+
+    /**
+     * 检查是否为空
+     * @protected
+     */
+    protected checkNullValue(value: string): boolean {
+        return value == null;
     }
 
     /**
