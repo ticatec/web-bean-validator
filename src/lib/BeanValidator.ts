@@ -9,8 +9,6 @@ const validate = (data: any, rules: Array<BaseValidator>): ValidationResult => {
     return result;
 }
 
-
-
 export default {
     validate
 }

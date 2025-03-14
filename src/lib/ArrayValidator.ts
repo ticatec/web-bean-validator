@@ -1,8 +1,8 @@
 import BaseValidator, {ValidatorOptions} from "./BaseValidator";
 import type ValidationResult from "./ValidationResult";
-import {getMessage} from "./Locale";
 import NestValidator from "./NestValidator";
-
+import i18n from "@ticatec/i18n";
+import langRes from "../i18n_resource";
 
 export interface ArrayValidatorOptions extends ValidatorOptions {
     rules?: Array<BaseValidator>;
@@ -25,10 +25,10 @@ export default class ArrayValidator extends NestValidator {
 
     protected checkField(arr: Array<any>, result: ValidationResult, data: any): boolean {
         if (this.minLen != null && arr.length < this.minLen) {
-            result.setError(this.field, this.formatMessage(getMessage().ARRAY_SHORTAGE, this.minLen));
+            result.setError(this.field, i18n.getText('ticatec.validation.arrayShortage', {length: this.minLen}, langRes.ticatec.validation.arrayShortage));
             return false;
         } else if (this.maxLen != null && arr.length > this.maxLen) {
-            result.setError(this.field, this.formatMessage(getMessage().ARRAY_EXCEED, this.maxLen));
+            result.setError(this.field, i18n.getText('ticatec.validation.arrayShortage', {length: this.maxLen}, langRes.ticatec.validation.arrayExceed));
             return  false;
         }
         if (this.rules && arr.length > 0) {

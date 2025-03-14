@@ -1,6 +1,6 @@
 {
   "name": "@ticatec/web-bean-validator",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "type": "module",
   "main": "index.js",
   "types": "index.d.ts",
@@ -10,10 +10,7 @@
     "publish:public": "cd ./dist && npm publish --access public"
   },
   "devDependencies": {
-    "@types/sprintf-js": "^1.1.4",
+    "@ticatec/i18n": "^0.0.5",
     "dayjs": "^1.11.13"
-  },
-  "dependencies": {
-    "sprintf-js": "^1.1.3"
   }
 }

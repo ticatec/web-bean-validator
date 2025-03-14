@@ -2,8 +2,8 @@
  * 自定义检查
  */
 import ValidationResult from "./ValidationResult";
-import {sprintf} from "sprintf-js";
-import {getMessage} from "./Locale";
+import langRes from "../i18n_resource";
+import i18n from "@ticatec/i18n";
 
 export type CustomCheck = (value: any, data: any) => any;
 
@@ -48,7 +48,7 @@ export default abstract class BaseValidator {
             let value = this.extractFieldValue(data);
             if (this.checkNullValue(value)) {
                 if (this.required) {
-                    result.setError(this.field, this.formatMessage(getMessage().REQUIRED));
+                    result.setError(this.field, i18n.getText('ticatec.validation.required', langRes.ticatec.validation.required));
                 }
             } else if (this.checkField(value, result, obj)) {
                 if (this.checkFun != null) {
@@ -59,16 +59,6 @@ export default abstract class BaseValidator {
                 }
             }
         }
-    }
-
-    /**
-     *
-     * @param message
-     * @param params
-     * @protected
-     */
-    protected formatMessage(message: string, ...params): string {
-        return sprintf(message, params);
     }
 
     /**

@@ -1,6 +1,7 @@
 import BaseValidator, {ValidatorOptions} from "./BaseValidator";
 import ValidationResult from "./ValidationResult";
-import {getMessage} from "./Locale";
+import i18n from "@ticatec/i18n";
+import langRes from "../i18n_resource";
 
 export interface NumberValidatorOptions extends ValidatorOptions {
     minValue?: number,  //最小值
@@ -21,11 +22,11 @@ export default class NumberValidator extends BaseValidator {
 
     protected checkField(value: any, result: ValidationResult): boolean {
         if (this.minValue != null && value < this.minValue) {
-            result.setError(this.field, this.formatMessage(getMessage().NUMBER_SHORTAGE, this.minValue));
+            result.setError(this.field, i18n.getText('ticatec.validator.numberShortage', {min: this.minValue}, langRes.ticatec.validation.numberShortage));
             return false;
         }
         if (this.maxValue != null && value > this.maxValue) {
-            result.setError(this.field, this.formatMessage(getMessage().NUMBER_EXCEED, this.maxValue));
+            result.setError(this.field, i18n.getText('ticatec.validator.numberShortage', {max: this.minValue}, langRes.ticatec.validation.numberExceed));
             return false;
         }
         return true;

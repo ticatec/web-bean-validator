@@ -1,5 +1,5 @@
 import BaseValidator, {ValidatorOptions} from "./BaseValidator";
-import {getMessage} from "./Locale";
+
 
 export interface EnumValidatorOptions extends ValidatorOptions {
     values: Array<any>;
