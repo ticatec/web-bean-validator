@@ -24,8 +24,8 @@ export default class DateValidator extends BaseValidator {
     protected maxDaysBefore: number;
     protected maxDaysAfter: number;
 
-    constructor(field: string, options: DateValidatorOptions = null) {
-        super(field, options.required == true, options.ignoreWhen, options.check);
+    constructor(field: string, options: DateValidatorOptions) {
+        super(field, options);
         this.from = options?.from;
         this.to = options?.to;
         this.maxDaysAfter = options?.maxDaysAfter;
@@ -37,11 +37,17 @@ export default class DateValidator extends BaseValidator {
         let latestDate = this.maxDaysAfter != null ? new Date(now + (this.maxDaysAfter + 1) * 86400000) : this.to;
         let earliestDate = this.maxDaysBefore != null ? new Date(now - this.maxDaysBefore * 8640000) : this.from;
         if (earliestDate && earliestDate > value) {
-            result.setError(this.field, i18n.getText('langRes.ticatec.validation.earliestDate', {date: formatDate(earliestDate)}, langRes.ticatec.validation.earliestDate));
+            result.setError(this.field, i18n.getText('langRes.ticatec.validation.earliestDate', {
+                field: this.name,
+                date: formatDate(earliestDate)
+            }, langRes.ticatec.validation.earliestDate));
             return false;
         }
         if (latestDate && latestDate < value) {
-            result.setError(this.field, i18n.getText('ticatec.validation.finalDate', {date: formatDate(latestDate)}, langRes.ticatec.validation.finalDate));
+            result.setError(this.field, i18n.getText('ticatec.validation.finalDate', {
+                field: this.name,
+                date: formatDate(latestDate)
+            }, langRes.ticatec.validation.finalDate));
             return false;
         }
         return true;

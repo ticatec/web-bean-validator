@@ -11,7 +11,7 @@ export default class EnumValidator extends BaseValidator {
     protected values: Array<any>;
 
     constructor(field: string, options: EnumValidatorOptions) {
-        super(field, options?.required == true, options.ignoreWhen, options.check);
+        super(field, options);
         this.values = options.values;
     }
 

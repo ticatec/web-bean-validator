@@ -1,6 +1,6 @@
 {
   "name": "@ticatec/web-bean-validator",
-  "version": "0.0.8",
+  "version": "0.0.10",
   "type": "module",
   "main": "index.js",
   "description": "This is a tool for automatically validating entities by defining rules, providing boundary checking for strings, numbers, dates, enums, objects, and arrays in JavaScript/TypeScript applications.",
@@ -25,12 +25,12 @@
   },
   "repository": {
     "type": "https",
-    "url": "https://github.com/ticatec/app-data-service.git"
+    "url": "https://github.com/ticatec/web-bean-validator.git"
   },
   "bugs": {
-    "url": "https://github.com/ticatec/app-data-service/issues"
+    "url": "https://github.com/ticatec/web-bean-validator/issues"
   },
-  "homepage": "https://github.com/ticatec/app-data-service",
+  "homepage": "https://github.com/ticatec/web-bean-validator",
   "author": {
     "name": "Henry Feng",
     "email": "huili.f@gmail.com"

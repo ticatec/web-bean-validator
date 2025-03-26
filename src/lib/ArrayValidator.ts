@@ -17,7 +17,7 @@ export default class ArrayValidator extends NestValidator {
     protected maxLen: number;
 
     constructor(field: string, options: ArrayValidatorOptions) {
-        super(field, options?.required == true, options.ignoreWhen, options.check);
+        super(field, options);
         this.rules = options?.rules;
         this.minLen = options?.minLen;
         this.maxLen = options?.maxLen;
@@ -25,11 +25,17 @@ export default class ArrayValidator extends NestValidator {
 
     protected checkField(arr: Array<any>, result: ValidationResult, data: any): boolean {
         if (this.minLen != null && arr.length < this.minLen) {
-            result.setError(this.field, i18n.getText('ticatec.validation.arrayShortage', {length: this.minLen}, langRes.ticatec.validation.arrayShortage));
+            result.setError(this.field, i18n.getText('ticatec.validation.arrayShortage', {
+                field: this.name,
+                length: this.minLen
+            }, langRes.ticatec.validation.arrayShortage));
             return false;
         } else if (this.maxLen != null && arr.length > this.maxLen) {
-            result.setError(this.field, i18n.getText('ticatec.validation.arrayShortage', {length: this.maxLen}, langRes.ticatec.validation.arrayExceed));
-            return  false;
+            result.setError(this.field, i18n.getText('ticatec.validation.arrayShortage', {
+                field: this.name,
+                length: this.maxLen
+            }, langRes.ticatec.validation.arrayExceed));
+            return false;
         }
         if (this.rules && arr.length > 0) {
             let valid = true;

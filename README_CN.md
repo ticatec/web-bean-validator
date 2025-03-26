@@ -207,14 +207,14 @@ export default en_resource;
 const cn_resource = {
     ticatec: {
         validation: {
-            required: `请输入数值`,
-            stringShortage: `长度至少{{length}}个字符`,
-            earliestDate: "时间不能早于{{date}}",
-            finalDate: "最后时间不能晚于{{date}}",
-            numberExceed: `数值不能超过{{max}}`,
-            numberShortage: `数值不能低于{{min}}`,
-            arrayExceed: `内容超过了{{length}}个记录`,
-            arrayShortage: `内容不能少于{{length}}个记录`
+            required: `请输入{{field}}的数值`,
+            stringShortage: `{{field}}长度至少{{length}}个字符`,
+            earliestDate: "{{field}}时间不能早于{{date}}",
+            finalDate: "{{field}}最后时间不能晚于{{date}}",
+            numberExceed: `{{field}}数值不能超过{{max}}`,
+            numberShortage: `{{field}}数值不能低于{{min}}`,
+            arrayExceed: `{{field}}内容超过了{{length}}个记录`,
+            arrayShortage: `{{field}}内容不能少于{{length}}个记录`
         }
     }
 }
@@ -241,7 +241,7 @@ let eduRules = [
 ]
 
 let userRules = [
-    new StringValidator('name', {minLen: 2, required: true}),
+    new StringValidator('name', {name:"姓名", minLen: 2, required: true}),
     new StringValidator('username', {required: true, format: {regex: /^[a-zA-Z0-9_-]{4,}$/, message: '无效的用户名'}}),
     new DateValidator('birthday', {required: false, maxDaysAfter: 0}),
     new ArrayValidator('education', {required: true, minLen: 1, eduRules})

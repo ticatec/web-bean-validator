@@ -4,6 +4,43 @@ This is a tool class that automatically validates entities (boundary checking) b
 
 [中文文档](./README_CN.md)
 
+
+
+
+---
+
+## I18N
+
+Error messages are internationalized using [@ticatec/i18n](https://github.com/ticatec/i18n).
+
+### Resources
+
+```ts
+import {cn_resource, en_resource} from "@ticatec/web-bean-validator"
+```
+
+* 英文资源
+
+```ts
+const en_resource = {
+    ticatec: {
+        validation: {
+            required: `Please enter a value for {{field}}`,
+            stringShortage: `{{field}} must be at least {{length}} characters long`,
+            earliestDate: "{{field}} cannot be earlier than {{date}}",
+            finalDate: "{{field}} cannot be later than {{date}}",
+            numberExceed: `{{field}} cannot exceed {{max}}`,
+            numberShortage: `{{field}} cannot be less than {{min}}`,
+            arrayExceed: `{{field}} cannot contain more than {{length}} records`,
+            arrayShortage: `{{field}} must contain at least {{length}} records`
+        }
+    }
+}
+
+export default en_resource;
+```
+
+
 ---
 ## Usage
 
@@ -30,6 +67,7 @@ let result = beanValidator.validate(data, rules);
 
 ```typescript
 interface ValidatorOptions {
+    name?: string, //field‘s name, if not assign, use field instead of name
     required?: boolean,
     check?: CustomCheck, // Custom validation function
     ignoreWhen?: IgnoreWhen  // Ignore validation when condition is met
@@ -42,6 +80,7 @@ interface ValidatorOptions {
 
 ```typescript
 interface StringValidatorOptions extends ValidatorOptions {
+    name: "Name",
     minLen?: number,  // Minimum length
     format?: {
         regex: RegExp, // Regular expression

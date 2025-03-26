@@ -13,6 +13,7 @@ export type CustomCheck = (value: any, data: any) => any;
 export type IgnoreWhen = (data: any) => boolean;
 
 export interface ValidatorOptions {
+    name?: string,
     required?: boolean | null,
     check?: CustomCheck | null,
     ignoreWhen?: IgnoreWhen
@@ -30,16 +31,15 @@ export default abstract class BaseValidator {
     /**
      * 构建基础校验器
      * @param field
-     * @param required
-     * @param ignoreWhen
-     * @param checkFun
+     * @param options
      * @protected
      */
-    protected constructor(field: string, required: boolean, ignoreWhen: IgnoreWhen = null, checkFun: CustomCheck = null) {
+    protected constructor(field: string, options: ValidatorOptions) {
         this.field = field;
-        this.required = required == true;
-        this.checkFun = checkFun;
-        this.ignoreWhen = ignoreWhen;
+        this.required = options.required == true;
+        this.name = options.name ?? field;
+        this.checkFun = options.check;
+        this.ignoreWhen = options.ignoreWhen;
     }
 
     validate(data: any, result: ValidationResult, obj: any) {
@@ -48,7 +48,7 @@ export default abstract class BaseValidator {
             let value = this.extractFieldValue(data);
             if (this.checkNullValue(value)) {
                 if (this.required) {
-                    result.setError(this.field, i18n.getText('ticatec.validation.required', langRes.ticatec.validation.required));
+                    result.setError(this.field, i18n.getText('ticatec.validation.required', {field: this.name}, langRes.ticatec.validation.required));
                 }
             } else if (this.checkField(value, result, obj)) {
                 if (this.checkFun != null) {

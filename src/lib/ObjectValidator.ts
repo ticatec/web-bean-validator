@@ -13,7 +13,7 @@ export default class ObjectValidator extends NestValidator {
     protected rules: Array<BaseValidator>;
 
     constructor(field: string, options: ObjectValidatorOptions) {
-        super(field, options?.required == true, options.ignoreWhen, options.check);
+        super(field, options);
         this.rules = options?.rules;
     }
 

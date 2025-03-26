@@ -1,5 +1,5 @@
 import BaseValidator, {ValidatorOptions} from "./BaseValidator";
-import  ValidationResult from "./ValidationResult";
+import ValidationResult from "./ValidationResult";
 import i18n from "@ticatec/i18n";
 import langRes from "../i18n_resource"
 
@@ -19,7 +19,7 @@ export default class StringValidator extends BaseValidator {
     protected format: StringFormat;
 
     constructor(field: string, options: StringValidatorOptions = null) {
-        super(field, options?.required == true, options.ignoreWhen, options.check);
+        super(field, options);
         this.minLen = options?.minLen;
         this.format = options?.format;
     }
@@ -30,7 +30,7 @@ export default class StringValidator extends BaseValidator {
      * @protected
      */
     protected checkNullValue(value: string): boolean {
-        return super.checkNullValue(value) || value.length==0;
+        return super.checkNullValue(value) || value.length == 0;
     }
 
     protected checkType(value: any): any {
@@ -39,10 +39,13 @@ export default class StringValidator extends BaseValidator {
 
     protected checkField(value: any, result: ValidationResult): boolean {
         if (this.minLen != null && value.length < this.minLen) {
-            result.setError(this.field, i18n.getText('ticatec.validator.stringShortage', {length: value.length}, langRes.ticatec.validation.stringShortage));
+            result.setError(this.field, i18n.getText('ticatec.validator.stringShortage', {
+                field: this.name,
+                length: value.length
+            }, langRes.ticatec.validation.stringShortage));
             return false;
         }
-        if (this.format != null && this.format.regex != null && value.match(this.format.regex)==null) {
+        if (this.format != null && this.format.regex != null && value.match(this.format.regex) == null) {
             result.setError(this.field, this.format.message);
             return false;
         }

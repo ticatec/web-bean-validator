@@ -15,18 +15,24 @@ export default class NumberValidator extends BaseValidator {
     protected maxValue: number;
 
     constructor(field: string, options: NumberValidatorOptions = null) {
-        super(field, options.required == true, options.ignoreWhen, options.check);
+        super(field, options);
         this.minValue = options?.minValue;
         this.maxValue = options?.maxValue;
     }
 
     protected checkField(value: any, result: ValidationResult): boolean {
         if (this.minValue != null && value < this.minValue) {
-            result.setError(this.field, i18n.getText('ticatec.validator.numberShortage', {min: this.minValue}, langRes.ticatec.validation.numberShortage));
+            result.setError(this.field, i18n.getText('ticatec.validator.numberShortage', {
+                field: this.name,
+                min: this.minValue
+            }, langRes.ticatec.validation.numberShortage));
             return false;
         }
         if (this.maxValue != null && value > this.maxValue) {
-            result.setError(this.field, i18n.getText('ticatec.validator.numberShortage', {max: this.minValue}, langRes.ticatec.validation.numberExceed));
+            result.setError(this.field, i18n.getText('ticatec.validator.numberShortage', {
+                field: this.name,
+                max: this.minValue
+            }, langRes.ticatec.validation.numberExceed));
             return false;
         }
         return true;
