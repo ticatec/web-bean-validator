@@ -2,8 +2,8 @@
  * 自定义检查
  */
 import ValidationResult from "./ValidationResult";
-import langRes from "../i18n_resource";
-import i18n from "@ticatec/i18n";
+import {i18nUtils} from "@ticatec/i18n";
+import i18nRes from "../i18nRes";
 
 export type CustomCheck = (value: any, data: any) => any;
 
@@ -12,9 +12,14 @@ export type CustomCheck = (value: any, data: any) => any;
  */
 export type IgnoreWhen = (data: any) => boolean;
 
+/**
+ * 根据条件检查是否为必须
+ */
+export type RequiredCheck = (data: any) => boolean;
+
 export interface ValidatorOptions {
     name?: string,
-    required?: boolean | null,
+    required?: boolean | RequiredCheck | null,
     check?: CustomCheck | null,
     ignoreWhen?: IgnoreWhen
 }
@@ -22,11 +27,10 @@ export interface ValidatorOptions {
 
 export default abstract class BaseValidator {
 
-    protected field: string;
-    protected checkFun: CustomCheck;
+    readonly field: string;
+    protected options: ValidatorOptions;
     protected name: string;
-    protected required: boolean;
-    protected ignoreWhen: IgnoreWhen;
+    protected required: boolean | RequiredCheck;
 
     /**
      * 构建基础校验器
@@ -36,28 +40,33 @@ export default abstract class BaseValidator {
      */
     protected constructor(field: string, options: ValidatorOptions) {
         this.field = field;
-        this.required = options.required == true;
+        this.required = typeof options.required == 'function' ? options.required : options.required == true;
         this.name = options.name ?? field;
-        this.checkFun = options.check;
-        this.ignoreWhen = options.ignoreWhen;
+        this.options = options;
+    }
+
+    clone(options: ValidatorOptions) {
+        const ctor = this.constructor as new (field: string, options: ValidatorOptions) => this;
+        return new ctor(this.field, {...this.options, ...options});
     }
 
     validate(data: any, result: ValidationResult, obj: any) {
-        let ignore = this.ignoreWhen != null && this.ignoreWhen(obj);
-        if (!ignore) {
+        if (this.options?.ignoreWhen?.(obj) != true) {
             let value = this.extractFieldValue(data);
             if (this.checkNullValue(value)) {
-                if (this.required) {
-                    result.setError(this.field, i18n.getText('ticatec.validation.required', {field: this.name}, langRes.ticatec.validation.required));
+                let required = typeof this.required == "function" ? this.required(data) : this.required;
+                if (required) {
+                    result.setError(this.field, this.formatErrorMessage(i18nRes.validation.required, {field: this.name}));
                 }
-            } else if (this.checkField(value, result, obj)) {
-                if (this.checkFun != null) {
-                    let checkError = this.checkFun(value, obj);
+            } else {
+                if (this.checkField(value, result, obj)) {
+                    let checkError = this.options.check?.(value, obj);
                     if (checkError != null) {
                         result.setError(this.field, checkError);
                     }
                 }
             }
+
         }
     }
 
@@ -108,6 +117,10 @@ export default abstract class BaseValidator {
             value = this.checkType(value);
         }
         return value;
+    }
+
+    protected formatErrorMessage(message: string, params?: any) {
+        return params ? i18nUtils.formatText(message, params) : message;
     }
 
 }

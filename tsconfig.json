@@ -9,5 +9,9 @@
 		"rootDir": "src",
 		"outDir": "dist"
 	},
-	"lib": ["es2017"]
+	"lib": ["es2017"],
+	"exclude": [
+		"dist",
+		"node_modules"
+	]
 }

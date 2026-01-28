@@ -1,287 +1,328 @@
-# WebBean Validation Tool
+# @ticatec/web-bean-validator
 
-This is a tool class that automatically validates entities (boundary checking) by defining rules.
+[![npm version](https://badge.fury.io/js/%40ticatec%2Fweb-bean-validator.svg)](https://badge.fury.io/js/%40ticatec%2Fweb-bean-validator)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[中文文档](./README_CN.md)
+A powerful TypeScript/JavaScript library for rule-based entity validation with comprehensive boundary checking. Perfect for form validation, API data validation, and any scenario requiring robust data integrity checks.
 
+[中文文档](./README_CN.md) | [English Documentation](./README.md)
 
+## Features
 
+- ✨ **Type-Safe**: Full TypeScript support with comprehensive type definitions
+- 🎯 **Rule-Based**: Define validation rules declaratively
+- 🌐 **I18n Ready**: Built-in internationalization support
+- 🔧 **Extensible**: Easy to create custom validators
+- 📦 **Lightweight**: Minimal dependencies
+- 🎨 **Flexible**: Support for conditional validation and custom checks
 
----
+## Supported Validators
 
-## I18N
+| Validator | Description | Options |
+|-----------|-------------|---------|
+| `StringValidator` | String validation with length and format checks | `minLen`, `format` |
+| `NumberValidator` | Number validation with range checks | `minValue`, `maxValue` |
+| `DateValidator` | Date validation with range and relative date checks | `from`, `to`, `maxDaysBefore`, `maxDaysAfter` |
+| `BooleanValidator` | Boolean validation with type conversion | - |
+| `EnumValidator` | Enumeration validation | `values` |
+| `ArrayValidator` | Array validation with length and item validation | `minLen`, `maxLen`, `rules` |
+| `ObjectValidator` | Object validation with nested rules | `rules` |
 
-Error messages are internationalized using [@ticatec/i18n](https://github.com/ticatec/i18n).
+## Installation
 
-### Resources
-
-```ts
-import {cn_resource, en_resource} from "@ticatec/web-bean-validator"
+```bash
+npm install @ticatec/web-bean-validator
 ```
 
-* 英文资源
+## Dependencies
 
-```ts
-const en_resource = {
-    ticatec: {
-        validation: {
-            required: `Please enter a value for {{field}}`,
-            stringShortage: `{{field}} must be at least {{length}} characters long`,
-            earliestDate: "{{field}} cannot be earlier than {{date}}",
-            finalDate: "{{field}} cannot be later than {{date}}",
-            numberExceed: `{{field}} cannot exceed {{max}}`,
-            numberShortage: `{{field}} cannot be less than {{min}}`,
-            arrayExceed: `{{field}} cannot contain more than {{length}} records`,
-            arrayShortage: `{{field}} must contain at least {{length}} records`
-        }
-    }
-}
+This package requires the following peer dependencies:
 
-export default en_resource;
+```bash
+npm install @ticatec/i18n dayjs
 ```
 
+## Quick Start
 
----
-## Usage
-
-```shell
-npm i @ticatec/web-bean-validator
-```
+### Basic Usage
 
 ```typescript
-import beanValidator from "@ticatec/web-bean-validator";
-import { BaseValidator, StringValidator, NumberValidator, DateValidator, EnumValidator, ObjectValidator, ArrayValidator } from "@ticatec/entity-validator";
+import BeanValidator from '@ticatec/web-bean-validator';
+import { StringValidator, NumberValidator } from '@ticatec/web-bean-validator';
 
-let rules: Array<BaseValidator> = [
-    // Define validation rules here
+// Define validation rules
+const rules = [
+  new StringValidator('name', { 
+    required: true, 
+    minLen: 2,
+    name: 'Full Name'
+  }),
+  new NumberValidator('age', { 
+    required: true, 
+    minValue: 0, 
+    maxValue: 120,
+    name: 'Age'
+  })
 ];
 
-let data = {};
+// Validate data
+const data = { name: 'John', age: 25 };
+const result = BeanValidator.validate(data, rules);
 
-let result = beanValidator.validate(data, rules);
+if (result.valid) {
+  console.log('Validation passed!');
+} else {
+  console.log('Validation errors:', result.errors);
+}
 ```
 
-## Validators
+### Advanced Examples
 
-### Common Validation Options
+#### String Validation with Format
+
+```typescript
+import { StringValidator } from '@ticatec/web-bean-validator';
+
+const emailValidator = new StringValidator('email', {
+  required: true,
+  name: 'Email Address',
+  format: {
+    regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    message: 'Please enter a valid email address'
+  }
+});
+```
+
+#### Date Validation
+
+```typescript
+import { DateValidator } from '@ticatec/web-bean-validator';
+
+const birthdateValidator = new DateValidator('birthdate', {
+  required: true,
+  name: 'Birth Date',
+  maxDaysBefore: 36500, // 100 years ago
+  to: new Date() // Cannot be in the future
+});
+```
+
+#### Array Validation
+
+```typescript
+import { ArrayValidator, StringValidator } from '@ticatec/web-bean-validator';
+
+const tagsValidator = new ArrayValidator('tags', {
+  required: true,
+  minLen: 1,
+  maxLen: 5,
+  name: 'Tags',
+  rules: [
+    new StringValidator('tag', { 
+      required: true, 
+      minLen: 2,
+      name: 'Tag'
+    })
+  ]
+});
+```
+
+#### Object Validation
+
+```typescript
+import { ObjectValidator, StringValidator, NumberValidator } from '@ticatec/web-bean-validator';
+
+const addressValidator = new ObjectValidator('address', {
+  required: true,
+  name: 'Address',
+  rules: [
+    new StringValidator('street', { required: true, name: 'Street' }),
+    new StringValidator('city', { required: true, name: 'City' }),
+    new StringValidator('zipCode', { required: true, name: 'ZIP Code' })
+  ]
+});
+```
+
+#### Conditional Validation
+
+```typescript
+import { StringValidator } from '@ticatec/web-bean-validator';
+
+const phoneValidator = new StringValidator('phone', {
+  name: 'Phone Number',
+  required: (data) => data.contactMethod === 'phone', // Required only if contact method is phone
+  ignoreWhen: (data) => data.contactMethod === 'email' // Ignore if contact method is email
+});
+```
+
+#### Custom Validation
+
+```typescript
+import { StringValidator } from '@ticatec/web-bean-validator';
+
+const passwordValidator = new StringValidator('password', {
+  required: true,
+  minLen: 8,
+  name: 'Password',
+  check: (value, data) => {
+    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
+      return 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
+    }
+    return null; // No error
+  }
+});
+```
+
+#### Complete Form Example
+
+```typescript
+import BeanValidator from '@ticatec/web-bean-validator';
+import { 
+  StringValidator, 
+  NumberValidator, 
+  DateValidator, 
+  EnumValidator,
+  BooleanValidator 
+} from '@ticatec/web-bean-validator';
+
+// User registration form validation
+const userRegistrationRules = [
+  new StringValidator('username', {
+    required: true,
+    minLen: 3,
+    name: 'Username',
+    format: {
+      regex: /^[a-zA-Z0-9_]+$/,
+      message: 'Username can only contain letters, numbers, and underscores'
+    }
+  }),
+  
+  new StringValidator('email', {
+    required: true,
+    name: 'Email',
+    format: {
+      regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      message: 'Please enter a valid email address'
+    }
+  }),
+  
+  new StringValidator('password', {
+    required: true,
+    minLen: 8,
+    name: 'Password',
+    check: (value) => {
+      if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
+        return 'Password must contain uppercase, lowercase, and number';
+      }
+      return null;
+    }
+  }),
+  
+  new NumberValidator('age', {
+    required: true,
+    minValue: 13,
+    maxValue: 120,
+    name: 'Age'
+  }),
+  
+  new EnumValidator('country', {
+    required: true,
+    name: 'Country',
+    values: ['US', 'CA', 'UK', 'AU', 'DE', 'FR', 'JP', 'CN']
+  }),
+  
+  new BooleanValidator('agreeToTerms', {
+    required: true,
+    name: 'Terms Agreement',
+    check: (value) => value === true ? null : 'You must agree to the terms'
+  })
+];
+
+// Validate user data
+const userData = {
+  username: 'john_doe',
+  email: 'john@example.com',
+  password: 'SecurePass123',
+  age: 25,
+  country: 'US',
+  agreeToTerms: true
+};
+
+const validationResult = BeanValidator.validate(userData, userRegistrationRules);
+
+if (validationResult.valid) {
+  console.log('User registration data is valid!');
+  // Proceed with registration...
+} else {
+  console.log('Validation errors:', validationResult.errors);
+  // Display errors to user...
+}
+```
+
+## API Reference
+
+### BaseValidator Options
+
+All validators inherit from `BaseValidator` and support these common options:
 
 ```typescript
 interface ValidatorOptions {
-    name?: string, //field‘s name, if not assign, use field instead of name
-    required?: boolean,
-    check?: CustomCheck, // Custom validation function
-    ignoreWhen?: IgnoreWhen  // Ignore validation when condition is met
-}
-```
-
-### String Type Validator
-
-#### Constructor
-
-```typescript
-interface StringValidatorOptions extends ValidatorOptions {
-    name: "Name",
-    minLen?: number,  // Minimum length
-    format?: {
-        regex: RegExp, // Regular expression
-        message: string // Message for failed match
-    }
+  name?: string;                    // Display name for error messages
+  required?: boolean | RequiredCheck; // Whether field is required
+  check?: CustomCheck;              // Custom validation function
+  ignoreWhen?: IgnoreWhen;         // Condition to skip validation
 }
 
-new StringValidator(field, options);
-```
-
-### Number Type Validator
-
-#### Constructor
-
-```typescript
-interface NumberValidatorOptions extends ValidatorOptions {
-    minValue?: number,  // Minimum value
-    maxValue?: number,  // Maximum value
-}
-
-new NumberValidator(field, options);
-```
-
-### Date/Time Type Validator
-
-#### Constructor
-
-```typescript
-interface DateValidatorOptions extends ValidatorOptions {
-    from?: Date, // Earliest date
-    to?: Date,  // Latest date
-    maxDaysBefore?: number,  // Maximum days before, 0 means starting from today
-    maxDaysAfter?: number,  // Maximum days after, 0 means the latest date is today
-}
-
-new DateValidator(field, options);
-```
-
-### Enum Type Validator
-
-#### Constructor
-
-```typescript
-interface EnumValidatorOptions extends ValidatorOptions {
-    values: Array<any>; // Enum values
-    check?: CustomCheck, // Custom validation function
-}
-
-new EnumValidator(field, options);
-```
-
-### Boolean Type Validator
-
-#### Constructor
-
-```typescript
-interface BooleanValidatorOptions extends ValidatorOptions {
-}
-
-new BooleanValidator(field, options);
-```
-
-### Object Type Validator
-
-#### Constructor
-
-```typescript
-interface ObjectValidatorOptions extends ValidatorOptions {
-    rules: Array<BaseValidator>;
-}
-
-new ObjectValidator(field, options);
-```
-
-### Array Type Validator
-
-#### Constructor
-
-```typescript
-interface ArrayValidatorOptions extends ValidatorOptions {
-    rules: Array<BaseValidator>;
-    minLen?: number;
-    maxLen?: number;
-}
-
-new ArrayValidator(field, options);
-```
-
-## Custom Check Methods
-
-When special validation methods are needed that the above cannot cover, you can define a programmatic check by passing a `check` function.
-
-```ts
-/**
- * value: The value of the current field
- * data: The value of the current object
- */
+type RequiredCheck = (data: any) => boolean;
 type CustomCheck = (value: any, data: any) => string | null;
-
-// Check that the start time must be earlier than the end time
-let checkDate = (value: any, data: any) => {
-    if (data.finished != null && value > data.finished) {
-        return "End time cannot be earlier than start time";
-    }
-};
-
-// Check for unique codes in an array
-let checkDuplicatedCode = (arr: any, data: any) => {
-    if (new Set(arr.map(item => item.code)).size != arr.length) {
-        return "There are duplicate codes in the devices";
-    }
-};
-```
----
-## I18N Support
-
-Error messages support internationalization through `@ticatec/i18n`. For more information, please refer to [i18n Internationalization](https://github.com/ticatec/i18n).
-
-### Built-in Resources
-
-```ts
-import {cn_resource, en_resource} from "@ticatec/web-bean-validator"
+type IgnoreWhen = (data: any) => boolean;
 ```
 
-* English resources
+### ValidationResult
 
-```ts
-const en_resource = {
-    ticatec: {
-        validation: {
-            required: `Please enter a value`,
-            stringShortage: `Length must be at least {{length}} characters`,
-            earliestDate: "Time cannot be earlier than {{date}}",
-            finalDate: "The latest time cannot be later than {{date}}",
-            numberExceed: `Value cannot exceed {{max}}`,
-            numberShortage: `Value cannot be less than {{min}}`,
-            arrayExceed: `Content exceeds {{length}} records`,
-            arrayShortage: `Content cannot be less than {{length}} records`
-        }
-    }
+```typescript
+class ValidationResult {
+  valid: boolean;     // Whether validation passed
+  errors: any;        // Object containing field errors
 }
-
-export default en_resource;
 ```
 
+## Error Messages & Internationalization
 
-* Chinese resources
+The library includes built-in error messages that support internationalization through the `@ticatec/i18n` package. You can customize error messages by providing your own i18n resources.
 
-```ts
-const cn_resource = {
-    ticatec: {
-        validation: {
-            required: `请输入数值`,
-            stringShortage: `长度至少{{length}}个字符`,
-            earliestDate: "时间不能早于{{date}}",
-            finalDate: "最后时间不能晚于{{date}}",
-            numberExceed: `数值不能超过{{max}}`,
-            numberShortage: `数值不能低于{{min}}`,
-            arrayExceed: `内容超过了{{length}}个记录`,
-            arrayShortage: `内容不能少于{{length}}个记录`
-        }
+### Resource json file
+
+```json
+{
+  "ticatec": {
+    "validation": {
+      "required": "Please enter a value",
+      "stringShortage": "The value must be at least {{length}} characters long",
+      "earliestDate": "The value cannot be earlier than {{date}}",
+      "finalDate": "The value cannot be later than {{date}}",
+      "numberExceed": "The value cannot exceed {{max}}",
+      "numberShortage": "The value cannot be less than {{min}}",
+      "arrayExceed": "The value cannot contain more than {{length}} records",
+      "arrayShortage": "The value must contain at least {{length}} records"
     }
+  }
 }
-
-export default cn_resource;
 ```
----
-## Example
 
-Validate user data
+## Contributing
 
-```ts
-import StringValidator from "./StringValidator";
-import DateValidator from "./DateValidator";
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-let eduRules = [
-    new DateValidator('start', { required: true, maxDaysAfter: 0, check: (value: any, obj: any) => {
-        // TODO: Check that the start date is earlier than the end date
-    }}),
-    new DateValidator('end', { required: false, maxDaysAfter: 0 }),
-    new StringValidator('name', { required: true })
-];
+## License
 
-let userRules = [
-    new StringValidator('name', { minLen: 2, required: true }),
-    new StringValidator('username', { required: true, format: { regex: /^[a-zA-Z0-9_-]{4,}$/, message: 'Invalid username' } }),
-    new DateValidator('birthday', { required: false, maxDaysAfter: 0 }),
-    new ArrayValidator('education', { required: true, minLen: 1, rules: eduRules })
-];
-```
----
-## Copyright Information
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Copyright © 2023 Ticatec. All rights reserved.
+## Support
 
-This library is released under the MIT License. For more details about the license, please refer to the [LICENSE](LICENSE) file.
+- 📄 [Documentation](https://github.com/ticatec/web-bean-validator#readme)
+- 🐛 [Report Issues](https://github.com/ticatec/web-bean-validator/issues)
+- 💬 [Discussions](https://github.com/ticatec/web-bean-validator/discussions)
 
----
-## Contact Information
+## Changelog
 
-huili.f@gmail.com
-
-https://github.com/ticatec/web-bean-validator
-
+See [CHANGELOG.md](CHANGELOG.md) for details about changes in each version.

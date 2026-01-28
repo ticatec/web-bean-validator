@@ -1,8 +1,7 @@
 import BaseValidator, {ValidatorOptions} from "./BaseValidator";
 import type ValidationResult from "./ValidationResult";
-import langRes from "../i18n_resource"
-import i18n from "@ticatec/i18n";
 import dayjs from "dayjs";
+import i18nRes from "../i18nRes";
 
 
 export interface DateValidatorOptions extends ValidatorOptions {
@@ -35,19 +34,19 @@ export default class DateValidator extends BaseValidator {
     protected checkField(value: any, result: ValidationResult): boolean {
         let now = (new Date()).getTime();
         let latestDate = this.maxDaysAfter != null ? new Date(now + (this.maxDaysAfter + 1) * 86400000) : this.to;
-        let earliestDate = this.maxDaysBefore != null ? new Date(now - this.maxDaysBefore * 8640000) : this.from;
+        let earliestDate = this.maxDaysBefore != null ? new Date(now - this.maxDaysBefore * 86400000) : this.from;
         if (earliestDate && earliestDate > value) {
-            result.setError(this.field, i18n.getText('langRes.ticatec.validation.earliestDate', {
+            result.setError(this.field, this.formatErrorMessage(i18nRes.validation.earliestDate, {
                 field: this.name,
                 date: formatDate(earliestDate)
-            }, langRes.ticatec.validation.earliestDate));
+            }));
             return false;
         }
         if (latestDate && latestDate < value) {
-            result.setError(this.field, i18n.getText('ticatec.validation.finalDate', {
+            result.setError(this.field,this.formatErrorMessage(i18nRes.validation.finalDate, {
                 field: this.name,
                 date: formatDate(latestDate)
-            }, langRes.ticatec.validation.finalDate));
+            }));
             return false;
         }
         return true;

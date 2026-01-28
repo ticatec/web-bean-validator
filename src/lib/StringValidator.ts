@@ -1,7 +1,6 @@
 import BaseValidator, {ValidatorOptions} from "./BaseValidator";
 import ValidationResult from "./ValidationResult";
-import i18n from "@ticatec/i18n";
-import langRes from "../i18n_resource"
+import i18nRes from "../i18nRes";
 
 interface StringFormat {
     regex: RegExp, //正则表达式
@@ -39,10 +38,10 @@ export default class StringValidator extends BaseValidator {
 
     protected checkField(value: any, result: ValidationResult): boolean {
         if (this.minLen != null && value.length < this.minLen) {
-            result.setError(this.field, i18n.getText('ticatec.validator.stringShortage', {
+            result.setError(this.field, this.formatErrorMessage(i18nRes.validation.stringShortage, {
                 field: this.name,
                 length: value.length
-            }, langRes.ticatec.validation.stringShortage));
+            }));
             return false;
         }
         if (this.format != null && this.format.regex != null && value.match(this.format.regex) == null) {
