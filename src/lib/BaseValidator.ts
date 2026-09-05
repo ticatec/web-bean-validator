@@ -38,35 +38,36 @@ export default abstract class BaseValidator {
      * @param options
      * @protected
      */
-    protected constructor(field: string, options: ValidatorOptions) {
+    protected constructor(field: string, options?: ValidatorOptions) {
         this.field = field;
-        this.required = typeof options.required == 'function' ? options.required : options.required == true;
-        this.name = options.name ?? field;
-        this.options = options;
+        const opts = options || {};
+        this.required = typeof opts.required === 'function' ? opts.required : opts.required === true;
+        this.name = opts.name ?? field;
+        this.options = opts;
     }
 
-    clone(options: ValidatorOptions) {
-        const ctor = this.constructor as new (field: string, options: ValidatorOptions) => this;
+    clone(options?: Partial<ValidatorOptions>): this {
+        const ctor = this.constructor as new (field: string, options?: any) => this;
         return new ctor(this.field, {...this.options, ...options});
     }
 
-    validate(data: any, result: ValidationResult, obj: any) {
-        if (this.options?.ignoreWhen?.(obj) != true) {
+    validate(data: any, result: ValidationResult, obj: any = data) {
+        const contextObj = obj !== undefined ? obj : data;
+        if (this.options?.ignoreWhen?.(contextObj) !== true) {
             let value = this.extractFieldValue(data);
             if (this.checkNullValue(value)) {
-                let required = typeof this.required == "function" ? this.required(data) : this.required;
+                let required = typeof this.required === "function" ? this.required(contextObj) : this.required;
                 if (required) {
-                    result.setError(this.field, this.formatErrorMessage(i18nRes.validation.required, {field: this.name}));
+                    result.setError(this.field, i18nRes.validation.required({field: this.name}));
                 }
             } else {
-                if (this.checkField(value, result, obj)) {
-                    let checkError = this.options.check?.(value, obj);
+                if (this.checkField(value, result, contextObj)) {
+                    let checkError = this.options.check?.(value, contextObj);
                     if (checkError != null) {
                         result.setError(this.field, checkError);
                     }
                 }
             }
-
         }
     }
 
@@ -102,16 +103,19 @@ export default abstract class BaseValidator {
      * 检查是否为空
      * @protected
      */
-    protected checkNullValue(value: string): boolean {
+    protected checkNullValue(value: any): boolean {
         return value == null;
     }
 
     /**
-     * 从数据中提前字段值
+     * 从数据中提取字段值
      * @param data
      * @private
      */
     private extractFieldValue(data: any): any {
+        if (data == null) {
+            return null;
+        }
         let value = data[this.field];
         if (value != null) {
             value = this.checkType(value);

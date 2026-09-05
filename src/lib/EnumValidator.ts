@@ -10,12 +10,12 @@ export default class EnumValidator extends BaseValidator {
 
     protected values: Array<any>;
 
-    constructor(field: string, options: EnumValidatorOptions) {
+    constructor(field: string, options?: EnumValidatorOptions) {
         super(field, options);
-        this.values = options.values;
+        this.values = options?.values ?? [];
     }
 
     protected checkType(value: any): any {
-        return this.values.includes(value) ? value : null;
+        return this.values && this.values.includes(value) ? value : null;
     }
 }

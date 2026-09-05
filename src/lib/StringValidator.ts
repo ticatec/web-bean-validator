@@ -17,7 +17,7 @@ export default class StringValidator extends BaseValidator {
     protected minLen: number;
     protected format: StringFormat;
 
-    constructor(field: string, options: StringValidatorOptions = null) {
+    constructor(field: string, options?: StringValidatorOptions) {
         super(field, options);
         this.minLen = options?.minLen;
         this.format = options?.format;
@@ -28,7 +28,7 @@ export default class StringValidator extends BaseValidator {
      * @param value
      * @protected
      */
-    protected checkNullValue(value: string): boolean {
+    protected checkNullValue(value: any): boolean {
         return super.checkNullValue(value) || value.length == 0;
     }
 
@@ -38,13 +38,10 @@ export default class StringValidator extends BaseValidator {
 
     protected checkField(value: any, result: ValidationResult): boolean {
         if (this.minLen != null && value.length < this.minLen) {
-            result.setError(this.field, this.formatErrorMessage(i18nRes.validation.stringShortage, {
-                field: this.name,
-                length: value.length
-            }));
+            result.setError(this.field, i18nRes.validation.stringShortage({length: this.minLen}));
             return false;
         }
-        if (this.format != null && this.format.regex != null && value.match(this.format.regex) == null) {
+        if (this.format != null && this.format.regex != null && !this.format.regex.test(value)) {
             result.setError(this.field, this.format.message);
             return false;
         }

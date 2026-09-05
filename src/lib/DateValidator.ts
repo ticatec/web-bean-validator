@@ -23,7 +23,7 @@ export default class DateValidator extends BaseValidator {
     protected maxDaysBefore: number;
     protected maxDaysAfter: number;
 
-    constructor(field: string, options: DateValidatorOptions) {
+    constructor(field: string, options?: DateValidatorOptions) {
         super(field, options);
         this.from = options?.from;
         this.to = options?.to;
@@ -36,29 +36,25 @@ export default class DateValidator extends BaseValidator {
         let latestDate = this.maxDaysAfter != null ? new Date(now + (this.maxDaysAfter + 1) * 86400000) : this.to;
         let earliestDate = this.maxDaysBefore != null ? new Date(now - this.maxDaysBefore * 86400000) : this.from;
         if (earliestDate && earliestDate > value) {
-            result.setError(this.field, this.formatErrorMessage(i18nRes.validation.earliestDate, {
-                field: this.name,
-                date: formatDate(earliestDate)
-            }));
+            result.setError(this.field, i18nRes.validation.earliestDate({date: formatDate(earliestDate)}));
             return false;
         }
         if (latestDate && latestDate < value) {
-            result.setError(this.field,this.formatErrorMessage(i18nRes.validation.finalDate, {
-                field: this.name,
-                date: formatDate(latestDate)
-            }));
+            result.setError(this.field, i18nRes.validation.finalDate({date: formatDate(latestDate)}));
             return false;
         }
         return true;
     }
 
     protected checkType(value: any): any {
-        if (typeof value == "string") {
-            value = new Date(value);
-        } else if (typeof value == "number") {
-            value = new Date(value);
+        if (value instanceof Date) {
+            return isNaN(value.getTime()) ? null : value;
         }
-        return value instanceof Date ? value : null;
+        if (typeof value === "string" || typeof value === "number") {
+            const d = new Date(value);
+            return isNaN(d.getTime()) ? null : d;
+        }
+        return null;
     }
 
 

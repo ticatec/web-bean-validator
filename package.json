@@ -1,9 +1,19 @@
 {
   "name": "@ticatec/web-bean-validator",
-  "version": "0.1.9",
+  "version": "0.2.0",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./i18nRes": {
+      "types": "./dist/i18nRes/index.d.ts",
+      "import": "./dist/i18nRes/index.js"
+    }
+  },
   "description": "A TypeScript/JavaScript library for rule-based entity validation with boundary checking for strings, numbers, dates, enums, objects, and arrays.",
   "keywords": [
     "validation",
@@ -32,23 +42,35 @@
   },
   "homepage": "https://github.com/ticatec/web-bean-validator#readme",
   "files": [
-    "**/*.js",
-    "**/*.d.ts",
+    "dist",
     "README.md",
     "README_CN.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "!dist/**/*.test.*",
+    "!dist/**/*.spec.*"
   ],
   "scripts": {
     "clean": "rm -rf ./dist",
     "build": "tsc",
-    "publish:public": "npm run build && npm publish --access public"
+    "typecheck": "tsc --noEmit",
+    "prepare": "pnpm run clean && pnpm run build",
+    "publish:public": "npm run build && npm publish --access public",
+    "test": "vitest",
+    "test:run": "vitest run --exclude src/__tests__/dist.test.ts",
+    "test:coverage": "vitest run --coverage --exclude src/__tests__/dist.test.ts",
+    "test:dist": "pnpm run build && vitest run src/__tests__/dist.test.ts",
+    "check": "pnpm run typecheck && pnpm run test:run && pnpm run test:dist"
   },
   "peerDependencies": {
-    "@ticatec/i18n": "^0.2.0",
+    "@ticatec/i18n": "^0.5.0",
     "dayjs": "^1.11.13"
   },
   "devDependencies": {
-    "@ticatec/i18n": "^0.2.0"
+    "@ticatec/i18n": "^0.5.0",
+    "@vitest/coverage-v8": "^2.1.0",
+    "dayjs": "^1.11.13",
+    "typescript": "^5.0.0",
+    "vitest": "^2.1.0"
   },
   "engines": {
     "node": ">=14.0.0"

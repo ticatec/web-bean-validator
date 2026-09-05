@@ -14,7 +14,7 @@ export default class NumberValidator extends BaseValidator {
     protected minValue: number;
     protected maxValue: number;
 
-    constructor(field: string, options: NumberValidatorOptions = null) {
+    constructor(field: string, options?: NumberValidatorOptions) {
         super(field, options);
         this.minValue = options?.minValue;
         this.maxValue = options?.maxValue;
@@ -22,26 +22,24 @@ export default class NumberValidator extends BaseValidator {
 
     protected checkField(value: any, result: ValidationResult): boolean {
         if (this.minValue != null && value < this.minValue) {
-            result.setError(this.field, this.formatErrorMessage(i18nRes.validation.numberShortage, {
-                field: this.name,
-                min: this.minValue
-            }));
+            result.setError(this.field, i18nRes.validation.numberShortage({min: this.minValue}));
             return false;
         }
         if (this.maxValue != null && value > this.maxValue) {
-            result.setError(this.field, this.formatErrorMessage(i18nRes.validation.numberExceed, {
-                field: this.name,
-                max: this.maxValue
-            }));
+            result.setError(this.field, i18nRes.validation.numberExceed({max: this.maxValue}));
             return false;
         }
         return true;
     }
 
     protected checkType(value: any): any {
-        if (!isNaN(value) && typeof value == "string") {
-            value = parseFloat(value);
+        if (typeof value === 'number') {
+            return isNaN(value) ? null : value;
         }
-        return isNaN(value) ? null : value;
+        if (typeof value === 'string' && value.trim() !== '') {
+            const num = Number(value.trim());
+            return isNaN(num) ? null : num;
+        }
+        return null;
     }
 }
